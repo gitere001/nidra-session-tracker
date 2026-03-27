@@ -7,9 +7,9 @@ type Session = {
   id: number
   date: string
   start_tasks: number
-  start_time_min: number
+  start_time_seconds: number
   end_tasks: number | null
-  end_time_min: number | null
+  end_time_seconds: number | null
   tasks_done: number | null
   hours_worked: number | null
   status: 'open' | 'closed'
@@ -19,6 +19,22 @@ type Totals = {
   total_tasks: number
   total_hours: number
   total_days: number
+}
+
+// function formatSeconds(s: number): string {
+//   if (s < 60) return `${s}s`
+//   if (s < 3600) return `${(s / 60).toFixed(1)}m`
+//   return `${(s / 3600).toFixed(1)}h`
+// }
+
+function formatSeconds(s: number): string {
+  if (s < 60) return `${s}s`
+  if (s < 3600) {
+    const mins = s / 60
+    return mins % 1 === 0 ? `${mins}m` : `${mins.toFixed(1)}m`
+  }
+  const hrs = s / 3600
+  return hrs % 1 === 0 ? `${hrs}h` : `${hrs.toFixed(1)}h`
 }
 
 export default function Dashboard() {
@@ -41,7 +57,6 @@ export default function Dashboard() {
         setLoading(false)
       })
 
-    // Get name from cookie — we pass it via a simple me endpoint
     fetch('/api/auth/me').then(r => r.json()).then(d => setName(d.name || ''))
   }, [router])
 
@@ -80,7 +95,7 @@ export default function Dashboard() {
           <div className="label">Total Tasks</div>
         </div>
         <div className="stat-card">
-          <div className="value">{Number(totals.total_hours).toFixed(1)}</div>
+          <div className="value">{Number(totals.total_hours).toFixed(2)}</div>
           <div className="label">Hours Worked</div>
         </div>
         <div className="stat-card">
@@ -95,7 +110,7 @@ export default function Dashboard() {
           <div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Session in progress</div>
             <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
-              {formatDate(openSession.date)} — Started at {openSession.start_tasks} tasks
+              {formatDate(openSession.date)} — Started at {openSession.start_tasks} tasks · {formatSeconds(openSession.start_time_seconds)}
             </div>
           </div>
           <Link href={`/session/end/${openSession.id}`} className="btn btn-danger btn-sm">
@@ -128,7 +143,7 @@ export default function Dashboard() {
                   <div className="meta">
                     {s.status === 'closed'
                       ? `${s.tasks_done?.toLocaleString()} tasks · ${Number(s.hours_worked).toFixed(2)} hrs`
-                      : `Started: ${s.start_tasks} tasks · ${s.start_time_min} min`}
+                      : `Started: ${s.start_tasks} tasks · ${formatSeconds(s.start_time_seconds)}`}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

@@ -60,9 +60,6 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <p style={{ fontSize: 12, color: '#aaa', textAlign: 'center', marginTop: 20 }}>
-          Default password: <strong>Nidra2026!</strong>
-        </p>
       </div>
     </div>
   )
